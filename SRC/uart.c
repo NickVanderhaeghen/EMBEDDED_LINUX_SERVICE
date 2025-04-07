@@ -1,0 +1,78 @@
+#include "../INCL/uart.h"
+
+
+int serial_port;
+struct termios tty;
+
+int uart_init(void){
+    return uartOpen();
+}
+
+int uartOpen(void){
+    serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
+
+    if(serial_port < 0) {
+        printf("Error %i from open: %s\n", errno, strerror(errno));
+        return 0;
+    }
+    printf("UART CONNECTIE GELUKT!\n\r");
+
+    //config
+    tcgetattr(serial_port, &tty);
+
+    //cflag bepaalt de flow
+	tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
+    tty.c_cflag &= ~CSTOPB; // Clear stop field, 
+    tty.c_cflag &= ~CSIZE; // Clear all bits that set the data size 
+    tty.c_cflag |= CS8; // 8 bits per byte (most common)
+    //tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
+    tty.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+  
+    //lflag bepaald de interactie vanuit linux op de lijn
+    tty.c_lflag &= ~ICANON;
+    tty.c_lflag &= ~ECHO; // Disable echotty
+    tty.c_lflag &= ~ECHOE; // Disable erasure
+    tty.c_lflag &= ~ECHONL; // Disable new-line echo
+    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+
+ 	//oflag output flags
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+
+    // hoe blokking of non blocking is de uart functies
+    tty.c_cc[VTIME] = 0;    // Wait for up to 0.x s (1 deciseconds), 
+    tty.c_cc[VMIN] = 0;	// wait for x byte
+
+
+    cfsetispeed(&tty, B115200);
+    cfsetospeed(&tty, B115200);
+
+    tcsetattr(serial_port, TCSANOW, &tty);
+    return 1;
+}
+
+void uartClose(void){
+    close(serial_port);
+}
+
+void uartWriteString(const void *buf){
+    write(serial_port, (char*)buf, strlen(buf)+1);
+}
+
+void uartWrite(const void *buf, int size){
+    write(serial_port, (char*)buf, size);    
+}
+
+int uartRead(char *buf){
+    int num_bytes = read(serial_port, buf, 20);
+
+    printf("nr bytes: %d\n\r", num_bytes);
+
+    #ifdef DEBUG
+        printf("nr byte: %d\n\r", num_bytes);
+    #endif
+
+    return num_bytes;
+}
