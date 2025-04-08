@@ -11,9 +11,13 @@ int uart_init(void){
 int uartOpen(void){
     serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
 
-    if(serial_port < 0) {
-        printf("Error %i from open: %s\n", errno, strerror(errno));
-        return 0;
+    while(serial_port < 0) {
+        printf("IK PROBEER DE UART NOGMAALS TE OPENEN\n\r");
+        serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
+        if(serial_port < 0) {
+            sleep(1);
+        }
+        
     }
     printf("UART CONNECTIE GELUKT!\n\r");
 
@@ -54,6 +58,7 @@ int uartOpen(void){
 }
 
 void uartClose(void){
+    printf("De uart wordt gesloten!");
     close(serial_port);
 }
 
@@ -62,7 +67,7 @@ void uartWriteString(const void *buf){
 }
 
 void uartWrite(const void *buf, int size){
-    write(serial_port, (char*)buf, size);    
+    write(serial_port, (__uint8_t*)buf, size);
 }
 
 int uartRead(char *buf){

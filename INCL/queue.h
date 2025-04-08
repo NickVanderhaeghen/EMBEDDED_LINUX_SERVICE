@@ -6,20 +6,25 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #pragma once
 
 typedef struct
 {
-    char cmd;
-    char data[10];
+    __uint8_t start;
+    __uint8_t length;
+    __uint8_t cmd;
+    char data[20];
+    __uint8_t wie;
+    __uint8_t stop;
 }my_msg_t;
 
 typedef struct
 {
-    long type;
     my_msg_t msg;
 }queue_msg_t;
+
 
 
 extern char * key_zin;
@@ -33,6 +38,8 @@ void queueRemove(int q_id);
 void queueSend(int q_id, queue_msg_t * message);
 void queueReceive(int q_id, queue_msg_t * message);
 
+queue_msg_t make_packet(__uint8_t cmd_p, char* data_p[20], __uint8_t wie_p);
 
+void queue_task();
 
 #endif
