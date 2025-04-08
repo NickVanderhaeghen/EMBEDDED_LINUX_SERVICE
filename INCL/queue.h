@@ -40,6 +40,4 @@ void queueReceive(int q_id, queue_msg_t * message);
 
 queue_msg_t make_packet(__uint8_t cmd_p, char* data_p[20], __uint8_t wie_p);
 
-void queue_task();
-
 #endif

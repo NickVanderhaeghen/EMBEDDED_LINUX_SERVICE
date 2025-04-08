@@ -25,7 +25,9 @@ int main(int argc, char* argv[]){
         while(1){
             printf("geef cmd in\n\r");
             scanf("%s", &buf);
-            queue_msg_t msg = make_packet('t', &buf, 'e');
+
+            queue_msg_t msg = make_packet('l', &buf, 'l');
+
             queueSend(queue_id, &msg);
             sleep(5);
             uartWrite(&msg, 25);
@@ -38,4 +40,19 @@ int main(int argc, char* argv[]){
     uartClose();
     printf("gesloten\n\r");
     return 0;
+}
+
+queue_msg_t make_packet(__uint8_t cmd_p, char* data_p[20], __uint8_t wie_p){
+    queue_msg_t queue_msg = {
+        .msg = {
+            .start = 's',
+            .length = 25,
+            .cmd = cmd_p,
+            .wie = wie_p,
+            .stop = 'x',
+        }
+    };
+    snprintf(&queue_msg.msg.data, 20, &buf);
+
+    return queue_msg;
 }
