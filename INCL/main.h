@@ -21,6 +21,6 @@
 void* rx_thread(void* args);
 void* tx_thread(void* args);
 
-
+void exit_prog();
 
 void main(int argc, char* argv[]);

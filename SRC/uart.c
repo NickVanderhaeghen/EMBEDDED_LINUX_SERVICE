@@ -76,14 +76,10 @@ void uartWrite(const void *buf, int size){
     write(serial_port, (__uint8_t*)buf, size);
 }
 
-int uartRead(char *buf){
-    int num_bytes = read(serial_port, buf, 20);
-
-    printf("nr bytes: %d\n\r", num_bytes);
-
-    #ifdef DEBUG
-        printf("nr byte: %d\n\r", num_bytes);
-    #endif
-
-    return num_bytes;
+void uartRead(char *buf){
+    int len = read(serial_port, buf, 10);
+    if(len > 0){
+        printf("data ontvangen\n\r");
+        printf("%s\n\r", buf);
+    }
 }

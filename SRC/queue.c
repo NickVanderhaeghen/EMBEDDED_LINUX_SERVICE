@@ -5,7 +5,6 @@ int key_getal = 42;
 
 
 
-
 int queue_init(void){
     int id = queueMake();
     return id;
@@ -40,12 +39,16 @@ void queueSend(int q_id, queue_msg_t * message){
     }
 }
 
-void queueReceive(int q_id, queue_msg_t * message){
+int queueReceive(int q_id, queue_msg_t * message){
+    // msg type = 1 -> nummer dient als filter. Zo kunnen we bepaalde messages uitlezen
     if(msgrcv(q_id, message, sizeof(queue_msg_t), 1, 0) >= 0){
         printf("msg is uit de queue gehaald\n\r");
+        return 1;
     }
-    // msg type = 1 -> nummer dient als filter. Zo kunnen we bepaalde messages uitlezen
+    return 0;
 }
+// msg type = 1 -> nummer dient als filter. Zo kunnen we bepaalde messages uitlezen
+
 
 
 void make_packet(__uint8_t cmd_p, char data_p[20], __uint8_t wie_p, queue_msg_t * queue_msg){

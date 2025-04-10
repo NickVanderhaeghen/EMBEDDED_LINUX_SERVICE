@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "../INCL/uart.h"
 #include "../INCL/wd.h"
+#include "../INCL/main.h"
 
 #pragma once
 
@@ -40,7 +41,7 @@ int queueOpen(void);
 void queueRemove(int q_id);
 
 void queueSend(int q_id, queue_msg_t * message);
-void queueReceive(int q_id, queue_msg_t * message);
+int queueReceive(int q_id, queue_msg_t * message);
 
 void make_packet(__uint8_t cmd_p, char data_p[20], __uint8_t wie_p, queue_msg_t * message);
 

@@ -11,6 +11,7 @@
 
 #include "../INCL/queue.h"
 #include "../INCL/wd.h"
+#include "../INCL/main.h"
 
 
 
@@ -21,7 +22,7 @@ void uartClose(void);
 void uartWriteString(const void *buf);
 void uartWrite(const void *buf, int size);
 
-int uartRead(char *buf);
+void uartRead(char *buf);
 
 
 
