@@ -9,6 +9,9 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "../INCL/queue.h"
+#include "../INCL/wd.h"
+
 
 
 int uart_init(void);

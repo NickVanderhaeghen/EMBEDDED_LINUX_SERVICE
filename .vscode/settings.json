@@ -3,6 +3,9 @@
         "wait.h": "c",
         "uart.h": "c",
         "queue.h": "c",
-        "msg.h": "c"
+        "msg.h": "c",
+        "wd.h": "c",
+        "stdio.h": "c",
+        "main.h": "c"
     }
 }

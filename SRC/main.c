@@ -1,58 +1,68 @@
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-
-#include <fcntl.h>
-#include <errno.h>
-
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/wait.h>
-
-#include "../INCL/queue.h"
 #include "../INCL/main.h"
-#include "../INCL/uart.h"
 
-#pragma once
 
-char buf[20];
+
+
+pthread_t rx_thread_t;
+pthread_t tx_thread_t;
 int queue_id;
+queue_msg_t msg;
+queue_msg_t msg_receive;
+char buf[20];
 
-int main(int argc, char* argv[]){
-    queue_id = queue_init();
-    if(uart_init()){
-        while(1){
-            printf("geef cmd in\n\r");
-            scanf("%s", &buf);
-
-            queue_msg_t msg = make_packet('l', &buf, 'l');
-
-            queueSend(queue_id, &msg);
-            sleep(5);
-            uartWrite(&msg, 25);
-        }
+void* rx_thread(void* args){
+    while (1)
+    {
+        sleep(5);
     }
-    else{
-        printf("De uart kan niet verbinden\n\r");
-        queueRemove(queue_id);
-    }
-    uartClose();
-    printf("gesloten\n\r");
-    return 0;
 }
 
-queue_msg_t make_packet(__uint8_t cmd_p, char* data_p[20], __uint8_t wie_p){
-    queue_msg_t queue_msg = {
-        .msg = {
-            .start = 's',
-            .length = 25,
-            .cmd = cmd_p,
-            .wie = wie_p,
-            .stop = 'x',
-        }
-    };
-    snprintf(&queue_msg.msg.data, 20, &buf);
+void* tx_thread(void* args){
 
-    return queue_msg;
+    while (1)
+    {   
+        printf("qid = %i\n\r", queue_id);
+        printf("geef cmd in\n\r");
+        scanf("%s", &buf);
+        make_packet('l', buf, 'l', &msg);
+        queueSend(queue_id, &msg);
+
+
+        queueReceive(queue_id, &msg_receive);
+
+        
+        printf("Bericht ontvangen:\n");
+        printf("Start: 0x%X\n", msg_receive.msg.start);
+        printf("Cmd: %c\n", msg_receive.msg.cmd);
+        printf("Data: %s\n", msg_receive.msg.data);
+        printf("Length: %d\n", msg_receive.msg.length);
+        printf("Wie: %c\n", msg_receive.msg.wie);
+        printf("Stop: 0x%02X\n", msg_receive.msg.stop);
+        sleep(3);
+        uartWrite(&msg_receive, sizeof(queue_msg_t)-sizeof(long));
+        //sleep(1);
+        //benjeernog();
+    }
+}
+
+
+
+
+
+
+
+void main(int argc, char* argv[]){
+    queue_id = queue_init();
+    int uart= uart_init();
+    if(uart == 0){
+        printf("de uart kon niet verbinden! kijk de aansluiting na! \n\r");
+        queueRemove(queue_id);
+        exit(0);
+    }
+    else{
+        pthread_create(&rx_thread_t, NULL, &rx_thread, NULL);
+        pthread_create(&tx_thread_t, NULL, &tx_thread, NULL);
+        pthread_join(rx_thread_t, NULL);
+        pthread_join(tx_thread_t, NULL);
+    }
 }

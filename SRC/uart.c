@@ -10,13 +10,19 @@ int uart_init(void){
 
 int uartOpen(void){
     serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
-
     while(serial_port < 0) {
-        printf("IK PROBEER DE UART NOGMAALS TE OPENEN\n\r");
-        serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
-        if(serial_port < 0) {
-            sleep(1);
+        for(int i = 0; i < 10; i++){        
+            printf("IK PROBEER DE UART NOGMAALS TE OPENEN. Poging %i\n\r", i);
+            serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
+            if(serial_port < 0) {
+                sleep(1);
+            }
+            else{break;}
         }
+        if(serial_port < 0) {
+            return 0;
+        }
+
         
     }
     printf("UART CONNECTIE GELUKT!\n\r");
