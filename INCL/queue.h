@@ -11,24 +11,11 @@
 #include "../INCL/uart.h"
 #include "../INCL/wd.h"
 #include "../INCL/main.h"
+#include "../INCL/test.h"
 
 #pragma once
 
-typedef struct
-{
-    __uint8_t start;
-    __uint8_t length;
-    __uint8_t cmd;
-    char data[20];
-    __uint8_t wie;
-    __uint8_t stop;
-}my_msg_t;
 
-typedef struct
-{
-    long mtype;
-    my_msg_t msg;
-}queue_msg_t;
 
 
 
@@ -43,6 +30,6 @@ void queueRemove(int q_id);
 void queueSend(int q_id, queue_msg_t * message);
 int queueReceive(int q_id, queue_msg_t * message);
 
-void make_packet(__uint8_t cmd_p, char data_p[20], __uint8_t wie_p, queue_msg_t * message);
+void make_packet(int queueid, __uint8_t cmd_p, char data_p[20], __uint8_t wie_p, queue_msg_t * message);
 
 #endif

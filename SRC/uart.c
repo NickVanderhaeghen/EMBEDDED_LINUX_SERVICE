@@ -4,27 +4,31 @@
 int serial_port;
 struct termios tty;
 
+jmp_buf open_uart;
+
+queue_msg_t buf_rx_msg;
+
 int uart_init(void){
     return uartOpen();
 }
 
 int uartOpen(void){
+    int aantal_keer = 0;
+    setjmp(open_uart);
     serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
-    while(serial_port < 0) {
-        for(int i = 0; i < 10; i++){        
-            printf("IK PROBEER DE UART NOGMAALS TE OPENEN. Poging %i\n\r", i);
-            serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
-            if(serial_port < 0) {
-                sleep(1);
-            }
-            else{break;}
-        }
-        if(serial_port < 0) {
-            return 0;
-        }
 
-        
+    if(serial_port < 0) {
+        printf("IK PROBEER DE UART TE OPENEN. Poging %i\n\r", aantal_keer);
+        aantal_keer++;
+        sleep(1);
+        longjmp(open_uart, 1); //wanneer de uart niet geopend kan worden blijft hij opnieuw proberen.
     }
+    if(serial_port < 0) {
+        return 0;
+    }
+
+    
+    
     printf("UART CONNECTIE GELUKT!\n\r");
 
     //config
@@ -64,7 +68,7 @@ int uartOpen(void){
 }
 
 void uartClose(void){
-    printf("De uart wordt gesloten!");
+    printf("De uart wordt gesloten!\n\r");
     close(serial_port);
 }
 
@@ -76,10 +80,18 @@ void uartWrite(const void *buf, int size){
     write(serial_port, (__uint8_t*)buf, size);
 }
 
-void uartRead(char *buf){
-    int len = read(serial_port, buf, 10);
-    if(len > 0){
+void uartRead(char *buf) {
+    int len = read(serial_port, buf, sizeof(my_msg_t));  // 22 bytes
+    if (len == sizeof(my_msg_t)) {
         printf("data ontvangen\n\r");
-        printf("%s\n\r", buf);
+        wd_count = 0;
+        printf("reset wd\n\r");
+        set_wd(5); //reset wd
+        buf_rx_msg.msg.cmd = &buf[2];
+        memcpy(buf_rx_msg.msg.data, &buf[5], 25);
+        buf_rx_msg.msg.wie = &buf[26];
+        //printf("cmd: %c\n\r", buf_rx_msg.msg.cmd);
+        //printf("data: %s\n\r", buf_rx_msg.msg.data);
+        //printf("wie: %c\n\r", buf_rx_msg.msg.wie);
     }
 }
