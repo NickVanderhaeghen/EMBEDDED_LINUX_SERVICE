@@ -30,6 +30,6 @@ void queueRemove(int q_id);
 void queueSend(int q_id, queue_msg_t * message);
 int queueReceive(int q_id, queue_msg_t * message);
 
-void make_packet(int queueid, __uint8_t cmd_p, char data_p[20], __uint8_t wie_p, queue_msg_t * message);
+void make_packet(int queueid, __uint8_t cmd_p, char data_p[20], __uint8_t wie_p);
 
 #endif

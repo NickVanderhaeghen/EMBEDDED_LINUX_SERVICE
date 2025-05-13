@@ -35,3 +35,6 @@ clean:
 
 run: BIN/prog1
 		./BIN/prog1
+
+pub: BIN/prog1
+	cp ~/Desktop/embedded_linux_work/BIN/prog1 /usr/sbin/linuxservice/
