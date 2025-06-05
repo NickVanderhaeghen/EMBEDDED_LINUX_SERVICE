@@ -18,7 +18,7 @@ int uartOpen(void){
     serial_port = open("/dev/ttyACM0", O_RDWR); //ttyACM0 = esp32-S3 serial = psoc
 
     if(serial_port < 0) {
-        //printf("IK PROBEER DE UART TE OPENEN. Poging %i\n\r", aantal_keer);
+        printf("IK PROBEER DE UART TE OPENEN. Poging %i\n\r", aantal_keer);
         aantal_keer++;
         sleep(1);
         longjmp(open_uart, 1); //wanneer de uart niet geopend kan worden blijft hij opnieuw proberen.
@@ -26,7 +26,7 @@ int uartOpen(void){
 
     
     
-    //printf("UART CONNECTIE GELUKT!\n\r");
+    printf("UART CONNECTIE GELUKT!\n\r");
 
     //config
     tcgetattr(serial_port, &tty);
@@ -80,15 +80,9 @@ void uartWrite(const void *buf, int size){
 void uartRead(char *buf) {
     int len = read(serial_port, buf, sizeof(my_msg_t));  // 22 bytes
     if (len == sizeof(my_msg_t)) {
-        //printf("data ontvangen\n\r");
         wd_count = 0;
-        //printf("reset wd\n\r");
-        set_wd(5); //reset wd
-        buf_rx_msg.msg.cmd = &buf[2];
         memcpy(buf_rx_msg.msg.data, &buf[5], 25);
-        buf_rx_msg.msg.wie = &buf[26];
-        //printf("cmd: %c\n\r", buf_rx_msg.msg.cmd);
-        //printf("data: %s\n\r", buf_rx_msg.msg.data);
-        //printf("wie: %c\n\r", buf_rx_msg.msg.wie);
+        printf("Data ontvangen. Data: %s! Reset WD!\n\r", buf_rx_msg.msg.data);
+        set_wd(5); //reset wd
     }
 }

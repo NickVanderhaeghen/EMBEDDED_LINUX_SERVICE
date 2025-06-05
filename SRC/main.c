@@ -36,12 +36,17 @@ void* tx_thread(void* args){
 
 
 void main(int argc, char* argv[]){
+    int fd1 = open("/home/nick/Documents/logfile.txt", O_RDWR|O_CREAT|O_APPEND, 0666);
+    dup2(fd1, STDOUT_FILENO);
+    setvbuf(stdout, NULL, _IOLBF, 0); //ZONDER WORDEN DE PRINTF GEBUFFERD EN NIET ONMIDDELIJK WEGGESCHREVEN.
+    close(fd1);
+    
     queue_id = queue_init(); //initialiseren van de queue
     int uart= uart_init(); //initialiseren van de uart
-    
     /*we maken een timer handler aan zodat deze funtie wordt 
     aangeroepen als de timer afloopt*/
     signal(SIGALRM, wd_trig);
+    set_wd(5);
 
 
     pthread_create(&rx_thread_t, NULL, &rx_thread, NULL);

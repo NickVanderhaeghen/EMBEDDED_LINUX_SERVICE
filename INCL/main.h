@@ -25,6 +25,7 @@
 #include "../INCL/queue.h"
 #include "../INCL/uart.h"
 #include "../INCL/wd.h"
+#include "../INCL/log.h"
 
 
 extern int queue_id;

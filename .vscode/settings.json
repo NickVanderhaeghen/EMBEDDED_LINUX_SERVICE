@@ -10,6 +10,9 @@
         "unistd.h": "c",
         "string.h": "c",
         "ipc.h": "c",
-        "msg_struct.h": "c"
-    }
+        "msg_struct.h": "c",
+        "fcntl.h": "c",
+        "setjmp.h": "c"
+    },
+    "makefile.configureOnOpen": false
 }
