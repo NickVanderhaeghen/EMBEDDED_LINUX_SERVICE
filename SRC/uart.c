@@ -23,9 +23,6 @@ int uartOpen(void){
         sleep(1);
         longjmp(open_uart, 1); //wanneer de uart niet geopend kan worden blijft hij opnieuw proberen.
     }
-    if(serial_port < 0) {
-        return 0;
-    }
 
     
     

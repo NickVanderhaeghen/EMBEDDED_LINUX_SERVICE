@@ -14,7 +14,8 @@ char buf_rx[sizeof(queue_msg_t)];
 
 
 
-
+/*we hebben voor threads gekozen omdat deze langs elkaar kunnen
+  werken en beide aan functies en variabele kunnen delen.*/
 void* rx_thread(void* args){
     while (1)
     {
@@ -25,36 +26,29 @@ void* rx_thread(void* args){
 void* tx_thread(void* args){
     while (1)
     {   
+        //ALS ER IETS IN DE QUEUE STAAT VERZEND HET DAN
         if(queueReceive(queue_id, &msg_receive) == 1){
             uartWrite(&msg_receive, sizeof(queue_msg_t)-sizeof(long));
         }
-
-        //sleep(1);
-        //benjeernog();
     }
 }
 
 
 
 void main(int argc, char* argv[]){
-    queue_id = queue_init();
-    int uart= uart_init();
-    //we maken een timer handler aan zodat deze funtie wordt aangeroepen als de
-    //timer afloopt
+    queue_id = queue_init(); //initialiseren van de queue
+    int uart= uart_init(); //initialiseren van de uart
+    
+    /*we maken een timer handler aan zodat deze funtie wordt 
+    aangeroepen als de timer afloopt*/
     signal(SIGALRM, wd_trig);
 
-    if(uart == 0){
-        //printf("de uart kon niet verbinden! kijk de aansluiting na! \n\r");
-        exit_prog();
-    }
-    else{
-        pthread_create(&rx_thread_t, NULL, &rx_thread, NULL);
-        pthread_create(&tx_thread_t, NULL, &tx_thread, NULL);
-    }
 
-    //sleep(1); //enablen wanneer while loop wordt verwijderd
+    pthread_create(&rx_thread_t, NULL, &rx_thread, NULL);
+    pthread_create(&tx_thread_t, NULL, &tx_thread, NULL);
+    
 
-
-    pthread_join(rx_thread_t, NULL); //detach ipv join omdat bij join de hoofdlus wacht tot de thread gedaan heeft
-    pthread_join(tx_thread_t, NULL); //,wat dus nooit zal gebeuren, wel join van maken wanneer while loop wordt verwijderd
+    //DE HOOFDLUS ZAL WACHTEN TOT DE THREAD AFLOPEN. ZE LOPEN ECHTER NOOT AF OWV DE WHILE(1)
+    pthread_join(rx_thread_t, NULL);
+    pthread_join(tx_thread_t, NULL);
 }
